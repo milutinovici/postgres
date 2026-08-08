@@ -2,11 +2,10 @@
 let
   ghWorkflows = builtins.attrNames (builtins.readDir ../.github/workflows);
   lintedWorkflows = [
-    "nix-eval.yml"
-    "nix-build.yml"
-    "testinfra-ami-build.yml"
     "ami-release-nix.yml"
-    "ami-release-nix-single.yml"
+    "nix-build.yml"
+    "nix-eval.yml"
+    "testinfra-ami-build.yml"
   ];
 in
 {
@@ -22,6 +21,21 @@ in
               enable = true;
               excludes = builtins.filter (name: !builtins.elem name lintedWorkflows) ghWorkflows;
               verbose = true;
+            };
+
+            shellcheck = {
+              enable = true;
+              excludes = [
+                # TODO fix these :pray:
+                "ansible/files/admin_api_scripts/grow_fs.sh"
+                "ansible/files/admin_api_scripts/pg_upgrade_scripts/initiate.sh"
+                "nix/init.sh"
+                "nix/packages/cli-config/supabase-postgres-init.sh"
+                "nix/tests/util/pgsodium_getkey.sh"
+                "nix/tests/util/pgsodium_getkey_arb.sh"
+                "tests/pg_upgrade/debug.sh"
+                "tests/pg_upgrade/scripts/entrypoint.sh"
+              ];
             };
 
             treefmt = {
